@@ -67,4 +67,26 @@ class SpreadsheetFeed extends \ArrayIterator
         return null;
     }
 
+    /**
+     * Gets a spreadhseet from the feed by its title and it's category. i.e. the name of the spreadsheet
+     * in google drive and the parent folder it is in
+     * 
+     * @param  string $title, string $category
+     * 
+     * @return \Google\Spreadsheet\Spreadsheet will return null if no spreadhseet found with the specified title
+     */
+    public function getByTitleAndCategory($title,$category)
+    {
+        foreach($this->xml->entry as $entry) {
+            foreach($entry->category as $categories) {
+                if($categories->attributes()->label->__toString() == $category) {
+                    if($entry->title->__toString() == $title) {
+                        return new Spreadsheet($entry);
+                    }          
+                }
+            }
+        }
+        return null;
+    }
+
 }

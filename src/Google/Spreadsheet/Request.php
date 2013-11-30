@@ -47,6 +47,13 @@ class Request
      */
     private $serviceUrl = 'https://spreadsheets.google.com/';
 
+   /**
+     * Service url
+     * 
+     * @var string
+     */
+    private $docServiceUrl = 'https://spreadsheets.google.com/';
+
     /**
      * Post body. Only used for POST and PUT requests
      * 
