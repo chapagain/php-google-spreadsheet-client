@@ -34,7 +34,7 @@ class SpreadsheetService
     public function getSpreadsheets()
     {
         $serviceRequest = ServiceRequestFactory::getInstance();
-        $serviceRequest->getRequest()->setEndpoint('feeds/spreadsheets/private/full');
+        $serviceRequest->getRequest()->setFullUrl('https://docs.google.com/feeds/documents/private/full/-/spreadsheet');
         $res = $serviceRequest->execute();
         return new SpreadsheetFeed($res);
     }
@@ -50,8 +50,50 @@ class SpreadsheetService
     public function getSpreadsheetById($id)
     {
         $serviceRequest = ServiceRequestFactory::getInstance();
-        $serviceRequest->getRequest()->setEndpoint('feeds/spreadsheets/private/full/'. $id);
+        $serviceRequest->getRequest()->setFullUrl('https://docs.google.com/feeds/documents/private/full/-/spreadsheet/'. $id);
         $res = $serviceRequest->execute();
         return new Spreadsheet($res);
     }
+
+    /**
+     * Fetches spreadsheet from google drive searching by title
+     * 
+     * @param  string $title the id of the spreadsheet
+     *
+     * @return \Google\Spreadsheet\Spreadsheet
+     */
+    public function getSpreadsheetsByTitle($title)
+    {
+        $serviceRequest = ServiceRequestFactory::getInstance();
+        $serviceRequest->getRequest()->setFullUrl('https://docs.google.com/feeds/documents/private/full/-/spreadsheet/?title='. urlencode($title));
+        $res = $serviceRequest->execute();
+        return new SpreadsheetFeed($res);
+    }
+
+    /**
+     * copy a spreadsheet
+     * 
+     * @param  string $id id of spreadsheet to copy, string $title name of copy
+     * 
+     * @return void
+     */
+    public function copySpreadsheet($id,$title)
+    {
+        $serviceRequest = ServiceRequestFactory::getInstance();
+
+        $entry = '
+            <entry xmlns="http://www.w3.org/2005/Atom">
+              <id>https://docs.google.com/feeds/default/private/full/document:'.$id.'</id>
+              <title>'.$title.'</title>
+            </entry>
+        ';
+
+        $serviceRequest->getRequest()->setFullUrl('https://docs.google.com/feeds/documents/private/full');
+        $serviceRequest->getRequest()->setMethod(Request::POST);
+        $serviceRequest->getRequest()->setHeaders(array('Content-Type'=>'application/atom+xml'));
+        $serviceRequest->getRequest()->setPost($entry);
+        $res = $serviceRequest->execute();
+#        var_dump($res);
+    }
+
 }
